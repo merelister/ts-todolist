@@ -4,6 +4,9 @@ import { Request, Response } from "express";
 const app = express();
 const port = 4000;
 
+import bodyParser from "body-parser";
+const jsonParser = bodyParser.json();
+
 import cors from "cors";
 app.use(
   cors({
@@ -18,11 +21,6 @@ app.use(morgan("dev"));
 // Database
 import { knexDB, initDB } from "../data/db";
 initDB(knexDB);
-
-// Routing
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
 
 const taskRoute = require("./routes/tasks");
 app.use("/api/tasks", taskRoute);

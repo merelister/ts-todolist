@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// PUT: /api/tasks/:user
+// PUT: /api/tasks/
 import { putTask } from "../functions/putTask";
 router.put("/", jsonParser, async (req, res) => {
   console.log("Body: ");
@@ -47,6 +47,20 @@ router.put("/", jsonParser, async (req, res) => {
   try {
     validateTask(req.body);
     await putTask(req.body);
+    res.send("Success");
+    return;
+  } catch (err) {
+    res.status(500).send(err);
+    console.log(err);
+    return;
+  }
+});
+
+// DELETE: /api/tasks/:id
+import { deleteTask } from "../functions/deleteTask";
+router.delete("/:id", async (req, res) => {
+  try {
+    await deleteTask(req.params.id);
     res.send("Success");
     return;
   } catch (err) {

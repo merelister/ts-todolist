@@ -1,5 +1,5 @@
 // Data Types From APP
-import { Tasks } from "knex/types/tables";
+import { Dependencies, Tasks } from "knex/types/tables";
 
 // Database
 import { knexDB } from "../../data/db";
@@ -16,15 +16,65 @@ export const putTask = async (task: Tasks): Promise<Tasks> => {
     }
 
     // Check if task values are valid
-    const { valid, issues } = validateTask(task);
-    if (!valid) {
+    const { valid, issues, validTask } = validateTask(task);
+    if (!valid || !validTask) {
       console.log("putTask: Invalid task");
       throw new Error(
         "Invalid task. Please check the following fields: " + issues.join(", ")
       );
     }
 
-    await knexDB("tasks").insert(task).onConflict("id").merge();
+    // Extract dependencies
+    const taskWithoutDependencies = { ...validTask };
+    delete taskWithoutDependencies.dependsOn;
+
+    const dependencies = validTask.dependsOn?.map((parentTask) => {
+      return { taskId: validTask.id, dependsOn: parentTask } as Dependencies;
+    });
+
+    // Insert task
+    await knexDB("tasks")
+      .insert(taskWithoutDependencies)
+      .onConflict("id")
+      .merge();
+
+    // // Get existing dependencies
+    // const existingDependencies = await knexDB
+    //   .select("dependsOn")
+    //   .from("dependencies")
+    //   .where("taskId", validTask.id);
+
+    // if (dependencies?.length > 0) {
+    //   if (existingDependencies.length > 0) {
+    //     // Check if any dependencies have been removed
+    //     const removedDependencies = existingDependencies.filter(
+    //       (existingDependency) =>
+    //         !dependencies?.find(
+    //           (dependency) =>
+    //             dependency.dependsOn === existingDependency.dependsOn
+    //         )
+    //     );
+
+    //     // Remove dependencies that no longer exist
+    //     if (removedDependencies.length > 0) {
+    //       await knexDB("dependencies")
+    //         .delete()
+    //         .whereIn(
+    //           "dependsOn",
+    //           removedDependencies.map((dependency) => dependency.dependsOn)
+    //         )
+    //         .andWhere("taskId", validTask.id);
+    //     }
+    //   }
+    // }
+
+    // // Insert new dependencies
+    // if (dependencies) {
+    //   await knexDB("dependencies")
+    //     .insert(dependencies)
+    //     .onConflict(["taskId", "dependsOn"])
+    //     .merge();
+    // }
 
     console.log("putTask: Success inserting task");
     return task;
