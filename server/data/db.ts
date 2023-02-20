@@ -101,7 +101,7 @@ export const seedDB = async (knexInstance: Knex) => {
     for (const state of states) {
       for (const assignee of assignedTo) {
         seedTasks.push({
-          id: `${state}-${assignee}`,
+          id: `${state}${assignee}`,
           title: `Task ${state} ${assignee}`,
           description: `This is a task in state ${state} assigned to ${assignee}`,
           state,
@@ -125,6 +125,26 @@ export const seedDB = async (knexInstance: Knex) => {
     return;
   } catch (err) {
     console.error("DB: Error seeding data");
+    console.log(err);
+    throw err;
+  }
+};
+
+export const resetDB = async (knexInstance: Knex) => {
+  try {
+    await knexInstance.schema.dropTable("tasks");
+    await knexInstance.schema.dropTable("dependencies");
+    console.log("DB: Dropped tables");
+
+    await initDB(knexInstance).catch((err) => {
+      console.error("DB: Error while trying to reinitialize tables");
+      console.log(err);
+      throw err;
+    });
+
+    return;
+  } catch (err) {
+    console.error("DB: Error dropping tables");
     console.log(err);
     throw err;
   }

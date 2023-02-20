@@ -2,7 +2,15 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 // Components
-import { Button, Center, Modal, Stack } from "@mantine/core";
+import {
+  Affix,
+  Button,
+  Card,
+  Center,
+  Group,
+  Modal,
+  Stack,
+} from "@mantine/core";
 import AddTask from "../AddTask/AddTask";
 import Task, { TaskType } from "../Task/Task";
 
@@ -53,11 +61,27 @@ function TaskList({
 
   return (
     <Center>
-      <Stack align={"center"} style={{ width: "50rem" }}>
-        <Button onClick={() => setModalOpened(true)}>New Task</Button>
-        <Button onClick={() => setNeedsUpdate(true)}>Refresh</Button>
-        {/* Assigned To Chips */}
+      <Affix position={{ bottom: 20, right: 20 }}>
+        <Card>
+          <Group>
+            <Button onClick={() => setModalOpened(true)}>New Task</Button>
+            <Button onClick={() => setNeedsUpdate(true)}>Refresh</Button>
+            <Button
+              color={"red"}
+              onClick={() => {
+                axios.delete("http://localhost:4000/api/reset").then((res) => {
+                  console.log(res);
+                  setNeedsUpdate(true);
+                });
+              }}
+            >
+              Reset Database
+            </Button>
+          </Group>
+        </Card>
+      </Affix>
 
+      <Stack align={"center"} style={{ width: "50rem" }}>
         {modalOpened && (
           <Modal
             opened={modalOpened}

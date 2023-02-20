@@ -1,15 +1,16 @@
 import {
   Button,
   Card,
-  Checkbox,
+  Code,
   Divider,
   Group,
-  Stack,
+  Modal,
   Text,
   Title,
 } from "@mantine/core";
 import axios from "axios";
 import { useState } from "react";
+import TaskDetails from "../TaskDetails/TaskDetails";
 
 // Task type
 export type TaskType = {
@@ -32,66 +33,98 @@ function Task({
 }) {
   const { id, title, description, state, updatedAt, createdAt, assignedTo } =
     taskProps;
-  const [checked, setChecked] = useState(state === "completed");
 
-  const cardColor = (): string => {
+  const [showDetails, setShowDetails] = useState(false);
+
+  const cardEmoji = (): string => {
     switch (assignedTo) {
       case "Adam":
-        return "#ffd9a8";
+        return "🚄";
       case "Meredith":
-        return "#a8ffba";
+        return "🧸";
       default:
-        return "none";
+        return "👽";
     }
   };
 
+  // Handlers
+  const handleDelete = async (event: React.MouseEvent) => {
+    await axios.delete(`http://localhost:4000/api/tasks/${id}`);
+    setNeedsUpdate(true);
+  };
+
+  const handleComplete = async (event: React.MouseEvent) => {
+    await axios.put(`http://localhost:4000/api/tasks/`, {
+      ...taskProps,
+      state: "completed",
+    });
+    setNeedsUpdate(true);
+  };
+
+  const handleIncomplete = async (event: React.MouseEvent) => {
+    await axios.put(`http://localhost:4000/api/tasks/`, {
+      ...taskProps,
+      state: "incomplete",
+    });
+    setNeedsUpdate(true);
+  };
+
   return (
-    // <Card withBorder style={{ width: "100%" }}>
-    <>
-      <Group position="apart" noWrap>
-        <Button
-          onClick={async (event) => {
-            // console.log(event);
-            await axios.delete(`http://localhost:4000/api/tasks/${id}`);
-            setNeedsUpdate(true);
-          }}
-          color="red"
+    <Card withBorder style={{ width: "100%" }}>
+      {/* Modal */}
+      {showDetails && (
+        <Modal
+          title="Task Details"
+          opened={showDetails}
+          onClose={() => setShowDetails(false)}
         >
-          Delete
-        </Button>
-        <Title order={1}>{title}</Title>
-        <Checkbox
-          label="complete"
-          checked={checked}
-          onChange={(event) => {
-            setChecked(event.currentTarget.checked);
+          <TaskDetails
+            handleDelete={handleDelete}
+            handleComplete={handleComplete}
+            handleIncomplete={handleIncomplete}
+            task={taskProps}
+          />
+        </Modal>
+      )}
 
-            const checkedString = event.currentTarget.checked
-              ? "completed"
-              : "incomplete";
+      {/* Main */}
+      <Group position="apart" noWrap>
+        <Title order={2}>
+          {cardEmoji()} {title}
+        </Title>
+        <Group noWrap>
+          {/* Buttons */}
+          <Button onClick={() => setShowDetails(true)} color="blue">
+            Details
+          </Button>
+          <Button onClick={handleDelete} color="red">
+            Delete{" "}
+          </Button>
+          {state !== "completed" ? (
+            <Button onClick={handleComplete} color="green">
+              Complete
+            </Button>
+          ) : (
+            <Button onClick={handleIncomplete} color="violet">
+              Undo
+            </Button>
+          )}
+        </Group>
+      </Group>
+      <Divider mt={"xs"} />
 
-            console.log({
-              ...taskProps,
-              state: checkedString,
-            });
-
-            axios.put("http://localhost:4000/api/tasks", {
-              ...taskProps,
-              state: checkedString,
-            });
+      <Group position="apart" noWrap>
+        <Code
+          style={{
+            width: "100%",
           }}
-        />
+          p={"xs"}
+          block
+        >
+          {description || "no description"}
+        </Code>
       </Group>
-      <Divider />
-
-      <Group mt="md" position="apart" noWrap>
-        <Stack>
-          <Text>{description || "no description"}</Text>
-          <Text>{state} </Text>
-        </Stack>
-        <Stack></Stack>
-      </Group>
-      <Text>Assigned to: {assignedTo}</Text>
+      {/* <Text>Assigned to: {assignedTo}</Text> */}
       <Divider />
       <Group mt={"xs"} position="apart" noWrap>
         <Text size={"sm"} italic>
@@ -101,8 +134,7 @@ function Task({
           Updated at: {updatedAt.toDateString()}
         </Text>
       </Group>
-    </>
-    // </Card>
+    </Card>
   );
 }
 

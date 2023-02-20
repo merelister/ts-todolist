@@ -73,5 +73,6 @@ export const validateTask = (
     return { valid: false, issues: taskIssues };
   }
 
+  console.debug("validateTask: Valid task");
   return { valid: true, issues: [], validTask: task };
 };

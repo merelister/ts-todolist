@@ -1,7 +1,7 @@
 import { Card, Chip, Group, Stack, Title } from "@mantine/core";
 import { useState } from "react";
-import TaskList from "../../components/TaskList/TaskList";
 import { TaskType } from "../../components/Task/Task";
+import TaskList from "../../components/TaskList/TaskList";
 
 function Dashboard() {
   // chip group 1 is for states and are ORed together
@@ -31,36 +31,37 @@ function Dashboard() {
 
   return (
     <>
-      <Group position="apart">
-        <Stack>
-          <Title>Assigned To</Title>
-          <Chip.Group
-            multiple={true}
-            value={stateValue}
-            onChange={setStateValue}
-            position="center"
-          >
-            <Chip value="incomplete">Incomplete</Chip>
-            <Chip value="in-progress">In Progress</Chip>
-            <Chip value="hidden">Hidden</Chip>
-            <Chip value="completed">Completed</Chip>
-          </Chip.Group>
-        </Stack>
-        <Stack>
-          <Title>State</Title>
-          <Chip.Group
-            multiple={true}
-            value={assignedToValue}
-            onChange={setAssignedToValue}
-            position="center"
-          >
-            <Chip value="Meredith">Meredith</Chip>
-            <Chip value="Adam">Adam</Chip>
-            <Chip value="unassigned">Unassigned</Chip>
-          </Chip.Group>
-        </Stack>
-      </Group>
-
+      <Card mb={"md"}>
+        <Group position="apart">
+          <Stack>
+            <Title>State</Title>
+            <Chip.Group
+              multiple={true}
+              value={stateValue}
+              onChange={setStateValue}
+              position="center"
+            >
+              <Chip value="incomplete">Incomplete</Chip>
+              <Chip value="in-progress">In Progress</Chip>
+              <Chip value="hidden">Hidden</Chip>
+              <Chip value="completed">Completed</Chip>
+            </Chip.Group>
+          </Stack>
+          <Stack>
+            <Title>Assigned To</Title>
+            <Chip.Group
+              multiple={true}
+              value={assignedToValue}
+              onChange={setAssignedToValue}
+              position="center"
+            >
+              <Chip value="Meredith">Meredith</Chip>
+              <Chip value="Adam">Adam</Chip>
+              <Chip value="unassigned">Unassigned</Chip>
+            </Chip.Group>
+          </Stack>
+        </Group>
+      </Card>
       <TaskList
         states={convertedList(stateValue, assignedToValue).convertedStateValue}
         assignedTos={

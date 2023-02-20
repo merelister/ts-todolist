@@ -11,6 +11,7 @@ import {
 import { useForm } from "@mantine/form";
 import axios from "axios";
 import { TaskType } from "../Task/Task";
+import { v4 as uuidv4 } from "uuid";
 
 function AddTask({
   tasks,
@@ -24,7 +25,7 @@ function AddTask({
   const [errorMessage, setErrorMessage] = useState("");
 
   const initialValues: TaskType = {
-    id: "1",
+    id: uuidv4(),
     title: "",
     description: "",
     assignedTo: "unassigned",

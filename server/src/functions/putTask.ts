@@ -32,6 +32,7 @@ export const putTask = async (task: Tasks): Promise<Tasks> => {
       return { taskId: validTask.id, dependsOn: parentTask } as Dependencies;
     });
 
+    console.debug("putTask: Inserting task");
     // Insert task
     await knexDB("tasks")
       .insert(taskWithoutDependencies)

@@ -22,6 +22,21 @@ app.use(morgan("dev"));
 import { knexDB, initDB } from "../data/db";
 initDB(knexDB);
 
+import { resetDB } from "../data/db";
+// DEBUG -- RESET DB ROUTE
+app.delete("/api/reset", async (_res, res: Response) => {
+  await resetDB(knexDB)
+    .then(() => {
+      console.log("DB reset");
+      res.send("DB reset");
+    })
+    .catch((err) => {
+      console.log("DB reset failed");
+      res.send("DB reset failed");
+    });
+});
+
+// Tasks
 const taskRoute = require("./routes/tasks");
 app.use("/api/tasks", taskRoute);
 
